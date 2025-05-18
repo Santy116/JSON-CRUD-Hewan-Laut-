@@ -94,59 +94,51 @@
             color: white;
         }
         
-        .form-container {
-            max-width: 600px;
-            margin: 0 auto;
-            background-color: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-        
-        .form-group {
-            margin-bottom: 15px;
-        }
-        
-        label {
-            display: block;
-            margin-bottom: 5px;
-            color: var(--color-text);
-            font-weight: 500;
-        }
-        
-        input[type="text"],
-        textarea,
-        select {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid var(--color-border);
+        .alert {
+            padding: 15px;
+            margin-bottom: 20px;
             border-radius: 4px;
-            font-size: 16px;
         }
         
-        textarea {
-            height: 100px;
-            resize: vertical;
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
         }
         
-        .submit-btn {
-            background-color: var(--color-primary);
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 16px;
-        }
-        
-        .submit-btn:hover {
-            background-color: #4a8db8;
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
         }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>DATA HEWAN LAUT</h1>
+        
+        <?php
+        // Tampilkan notifikasi
+        if (isset($_GET['status'])) {
+            $status = $_GET['status'];
+            $action = $_GET['action'] ?? '';
+            $messages = [
+                'success' => [
+                    'create' => 'Data berhasil ditambahkan!',
+                    'update' => 'Data berhasil diperbarui!',
+                    'delete' => 'Data berhasil dihapus!'
+                ],
+                'error' => 'Terjadi kesalahan!'
+            ];
+            
+            if ($status === 'success') {
+                echo "<div class='alert success'>{$messages[$status][$action]}</div>";
+            } else {
+                echo "<div class='alert error'>{$messages[$status]}</div>";
+            }
+        }
+        ?>
+        
         <a href="create.php" class="btn">Tambah Hewan Laut</a>
         
         <table>
@@ -170,16 +162,20 @@
                 foreach ($dataHewan as $data) {
                     echo "<tr>
                             <td>$no</td>
-                            <td>{$data['nama']}</td>
-                            <td>{$data['jenis']}</td>
-                            <td>{$data['habitat']}</td>
-                            <td>{$data['deskripsi']}</td>
+                            <td>" . htmlspecialchars($data['nama']) . "</td>
+                            <td>" . htmlspecialchars($data['jenis']) . "</td>
+                            <td>" . htmlspecialchars($data['habitat']) . "</td>
+                            <td>" . htmlspecialchars($data['deskripsi']) . "</td>
                             <td>
-                                <a href='edit.php?id={$data['id']}' class='action-btn edit-btn'>Edit</a>
-                                <a href='delete.php?id={$data['id']}' class='action-btn delete-btn' onclick='return confirm(\"Apakah Anda yakin ingin menghapus?\")'>Hapus</a>
+                                <a href='edit.php?id=" . htmlspecialchars($data['id']) . "' class='action-btn edit-btn'>Edit</a>
+                                <a href='delete.php?id=" . htmlspecialchars($data['id']) . "' class='action-btn delete-btn' onclick='return confirm(\"Apakah Anda yakin ingin menghapus?\")'>Hapus</a>
                             </td>
                         </tr>";
                     $no++;
+                }
+                
+                if (empty($dataHewan)) {
+                    echo "<tr><td colspan='6' style='text-align:center;'>Tidak ada data hewan laut</td></tr>";
                 }
                 ?>
             </tbody>

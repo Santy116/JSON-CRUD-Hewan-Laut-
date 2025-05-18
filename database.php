@@ -1,7 +1,7 @@
 <?php
 const DB_HOST = 'localhost';
 const DB_USERNAME = 'root';
-const DB_NAME = 'db_hewanlaut';
+const DB_NAME = 'santy_pwd8';
 const DB_PASS = '';
 
 class Database {
@@ -10,8 +10,9 @@ class Database {
     public function __construct() {
         $this->mysqli = new mysqli(DB_HOST, DB_USERNAME, DB_PASS, DB_NAME);
         if ($this->mysqli->connect_error) {
-            echo "Error: koneksi gagal";
+            die("Error: koneksi gagal - " . $this->mysqli->connect_error);
         }
+        $this->mysqli->set_charset("utf8mb4");
     }
     
     public function __destruct() {
@@ -22,9 +23,17 @@ class Database {
         $sql = "SELECT * FROM $table";
         
         if ($where != null) {
+            $conditions = [];
             foreach ($where as $key => $value) {
-                $sql .= " WHERE $key = '$value'";
+                $conditions[] = "$key = ?";
             }
+            $sql .= " WHERE " . implode(" AND ", $conditions);
+            
+            $stmt = $this->mysqli->prepare($sql);
+            $types = str_repeat('s', count($where));
+            $stmt->bind_param($types, ...array_values($where));
+            $stmt->execute();
+            return $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
         }
         
         $result = $this->mysqli->query($sql);
@@ -33,40 +42,53 @@ class Database {
     
     public function insert($table, $data) {
         $columns = implode(", ", array_keys($data));
-        $values = "'" . implode("', '", array_values($data)) . "'";
-        $sql = "INSERT INTO $table ($columns) VALUES ($values)";
+        $placeholders = implode(", ", array_fill(0, count($data), "?"));
+        $sql = "INSERT INTO $table ($columns) VALUES ($placeholders)";
         
-        return $this->mysqli->query($sql);
+        $stmt = $this->mysqli->prepare($sql);
+        $types = str_repeat('s', count($data));
+        $stmt->bind_param($types, ...array_values($data));
+        return $stmt->execute();
     }
     
     public function update($table, $data, $where) {
         $sets = [];
         foreach ($data as $key => $value) {
-            $sets[] = "$key = '$value'";
+            $sets[] = "$key = ?";
         }
         $setClause = implode(", ", $sets);
         
         $whereClause = [];
+        $whereValues = [];
         foreach ($where as $key => $value) {
-            $whereClause[] = "$key = '$value'";
+            $whereClause[] = "$key = ?";
+            $whereValues[] = $value;
         }
         $whereClause = implode(" AND ", $whereClause);
         
         $sql = "UPDATE $table SET $setClause WHERE $whereClause";
         
-        return $this->mysqli->query($sql);
+        $stmt = $this->mysqli->prepare($sql);
+        $types = str_repeat('s', count($data) + count($where));
+        $stmt->bind_param($types, ...array_merge(array_values($data), $whereValues));
+        return $stmt->execute();
     }
     
     public function delete($table, $where) {
         $whereClause = [];
+        $whereValues = [];
         foreach ($where as $key => $value) {
-            $whereClause[] = "$key = '$value'";
+            $whereClause[] = "$key = ?";
+            $whereValues[] = $value;
         }
         $whereClause = implode(" AND ", $whereClause);
         
         $sql = "DELETE FROM $table WHERE $whereClause";
         
-        return $this->mysqli->query($sql);
+        $stmt = $this->mysqli->prepare($sql);
+        $types = str_repeat('s', count($where));
+        $stmt->bind_param($types, ...$whereValues);
+        return $stmt->execute();
     }
 }
 ?>
