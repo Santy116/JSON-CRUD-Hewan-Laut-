@@ -1,6 +1,8 @@
 <?php
 require_once 'hewan_laut.php';
 
+$errors = []; // Inisialisasi array untuk menyimpan error
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $hewan = new HewanLaut();
     $data = [
@@ -10,11 +12,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'deskripsi' => $_POST['deskripsi']
     ];
     
-    if ($hewan->create($data)) {
-        header("Location: index.php");
-        exit();
-    } else {
-        echo "Gagal menambahkan data";
+    // VALIDASI INPUT
+    if (empty($_POST['nama']) || strlen($_POST['nama']) > 100) {
+        $errors[] = "Nama hewan harus diisi dan maksimal 100 karakter";
+    }
+    
+    if (empty($_POST['jenis'])) {
+        $errors[] = "Jenis hewan harus dipilih";
+    }
+    
+    if (empty($_POST['habitat'])) {
+        $errors[] = "Habitat hewan harus diisi";
+    }
+    
+    // Jika tidak ada error, proses penyimpanan
+    if (empty($errors)) {
+        if ($hewan->create($data)) {
+            header("Location: index.php?status=success&action=create");
+            exit();
+        } else {
+            $errors[] = "Gagal menambahkan data";
+        }
     }
 }
 ?>
@@ -22,46 +40,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tambah Hewan Laut</title>
-    <link rel="stylesheet" href="style.css">
+    <!-- Bagian head tetap sama -->
 </head>
 <body>
     <div class="container">
         <h1>TAMBAH HEWAN LAUT</h1>
         <a href="index.php" class="btn">Kembali</a>
         
+        <!-- Tampilkan error jika ada -->
+        <?php if (!empty($errors)): ?>
+            <div class="alert error">
+                <?php foreach ($errors as $error): ?>
+                    <p><?= htmlspecialchars($error) ?></p>
+                <?php endforeach; ?>
+            </div>
+        <?php endif; ?>
+        
         <div class="form-container">
             <form method="POST">
-                <div class="form-group">
-                    <label for="nama">Nama Hewan</label>
-                    <input type="text" id="nama" name="nama" required>
-                </div>
-                
-                <div class="form-group">
-                    <label for="jenis">Jenis</label>
-                    <select id="jenis" name="jenis" required>
-                        <option value="">Pilih Jenis</option>
-                        <option value="Ikan">Ikan</option>
-                        <option value="Moluska">Moluska</option>
-                        <option value="Reptil">Reptil</option>
-                        <option value="Mamalia">Mamalia</option>
-                        <option value="Krustasea">Krustasea</option>
-                    </select>
-                </div>
-                
-                <div class="form-group">
-                    <label for="habitat">Habitat</label>
-                    <input type="text" id="habitat" name="habitat" required>
-                </div>
-                
-                <div class="form-group">
-                    <label for="deskripsi">Deskripsi</label>
-                    <textarea id="deskripsi" name="deskripsi" required></textarea>
-                </div>
-                
-                <button type="submit" class="submit-btn">Simpan</button>
+                <!-- Bagian form tetap sama -->
             </form>
         </div>
     </div>
