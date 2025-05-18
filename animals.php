@@ -54,46 +54,48 @@ if (isset($_GET['delete'])) {
     <div class="table-responsive">
         <table class="table table-striped table-hover">
             <thead class="thead-dark">
-                <tr>
-                    <th>No</th>
-                    <th>Gambar</th>
-                    <th>Nama</th>
-                    <th>Jenis</th>
-                    <th>Habitat</th>
-                    <th>Aksi</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php if (empty($dataHewan)): ?>
-                    <tr>
-                        <td colspan="6" class="text-center">Tidak ada data hewan laut</td>
-                    </tr>
-                <?php else: ?>
-                    <?php foreach ($dataHewan as $index => $data): ?>
-                        <tr>
-                            <td><?= $index + 1 ?></td>
-                            <td>
-                                <?php if (!empty($data['gambar'])): ?>
-                                    <img src="assets/images/<?= htmlspecialchars($data['gambar']) ?>" alt="<?= htmlspecialchars($data['nama']) ?>" class="img-thumbnail" style="width: 100px;">
-                                <?php else: ?>
-                                    <span class="text-muted">No image</span>
-                                <?php endif; ?>
-                            </td>
-                            <td><?= htmlspecialchars($data['nama']) ?></td>
-                            <td><?= htmlspecialchars($data['jenis']) ?></td>
-                            <td><?= htmlspecialchars($data['habitat']) ?></td>
-                            <td>
-                                <a href="crud/edit.php?id=<?= $data['id'] ?>" class="btn btn-sm btn-warning">
-                                    <i class="fas fa-edit"></i> Edit
-                                </a>
-                                <button class="btn btn-sm btn-danger delete-btn" data-id="<?= $data['id'] ?>">
-                                    <i class="fas fa-trash"></i> Hapus
-                                </button>
-                            </td>
-                        </tr>
-                    <?php endforeach; ?>
-                <?php endif; ?>
-            </tbody>
+    <tr>
+        <th>No</th>
+        <th>Gambar</th>
+        <th>Nama</th>
+        <th>Jenis</th>
+        <th>Habitat</th>
+        <th>Deskripsi</th> <!-- Tambahkan ini -->
+        <th>Aksi</th>
+    </tr>
+</thead>
+<tbody>
+    <?php if (empty($dataHewan)): ?>
+        <tr>
+            <td colspan="7" class="text-center">Tidak ada data hewan laut</td>
+        </tr>
+    <?php else: ?>
+        <?php foreach ($dataHewan as $index => $data): ?>
+            <tr>
+                <td><?= $index + 1 ?></td>
+                <td>
+                    <?php if (!empty($data['gambar'])): ?>
+                        <img src="assets/images/<?= htmlspecialchars($data['gambar']) ?>" alt="<?= htmlspecialchars($data['nama']) ?>" class="img-thumbnail" style="width: 100px;">
+                    <?php else: ?>
+                        <span class="text-muted">No image</span>
+                    <?php endif; ?>
+                </td>
+                <td><?= htmlspecialchars($data['nama']) ?></td>
+                <td><?= htmlspecialchars($data['jenis']) ?></td>
+                <td><?= htmlspecialchars($data['habitat']) ?></td>
+                <td><?= htmlspecialchars($data['deskripsi']) ?></td> <!-- Tambahkan ini -->
+                <td>
+                    <a href="crud/edit.php?id=<?= $data['id'] ?>" class="btn btn-sm btn-warning">
+                        <i class="fas fa-edit"></i> Edit
+                    </a>
+                    <button class="btn btn-sm btn-danger delete-btn" data-id="<?= $data['id'] ?>">
+                        <i class="fas fa-trash"></i> Hapus
+                    </button>
+                </td>
+            </tr>
+        <?php endforeach; ?>
+    <?php endif; ?>
+</tbody>
         </table>
     </div>
 </div>
