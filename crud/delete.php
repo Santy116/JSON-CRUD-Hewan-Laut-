@@ -1,18 +1,33 @@
 <?php
-require_once '../hewan_laut.php';
+require_once '../models/HewanLaut.php';
+require_once '../config/database.php';
 
-$hewan = new HewanLaut();
-$id = $_GET['id'];
+if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['id'])) {
+    $hewan = new HewanLaut();
+    $id = filter_var($_GET['id'], FILTER_VALIDATE_INT);
+    
+    if ($id === false || $id <= 0) {
+        header("Location: ../animals.php?status=error&action=invalid_id");
+        exit();
+    }
 
-if ($hewan->delete($id)) {
-    header("Location: index.php");
+    // Dapatkan data hewan untuk menghapus gambar terkait
+    $data = $hewan->getById($id);
+    if ($data && !empty($data['gambar'])) {
+        $gambarPath = "../assets/images/" . $data['gambar'];
+        if (file_exists($gambarPath)) {
+            unlink($gambarPath);
+        }
+    }
+
+    if ($hewan->delete($id)) {
+        header("Location: ../animals.php?status=success&action=delete");
+    } else {
+        header("Location: ../animals.php?status=error&action=delete");
+    }
     exit();
 } else {
-    echo "Gagal menghapus data";
-}
-
-// Di create.php dan edit.php tambahkan:
-if (empty($_POST['nama']) || strlen($_POST['nama']) > 100) {
-    $errors[] = "Nama hewan harus diisi dan maksimal 100 karakter";
+    header("Location: ../animals.php");
+    exit();
 }
 ?>
