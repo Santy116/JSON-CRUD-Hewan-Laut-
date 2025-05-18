@@ -1,7 +1,7 @@
 <?php
 const DB_HOST = 'localhost';
 const DB_USERNAME = 'root';
-const DB_NAME = 'santy_pwd8';
+const DB_NAME = 'db_hewanlaut';
 const DB_PASS = '';
 
 class Database {
